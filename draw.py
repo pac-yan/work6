@@ -3,17 +3,63 @@ from matrix import *
 from math import *
 
 def add_box( points, x, y, z, width, height, depth ):
-    pass
+    x0 = x + width
+    y0 = y - height
+    z0 = x - depth
+    add_edge(points, x, y, z0, x0, y, z1)
+    add_edge(points, x, y, z0, x, y0, z0)
+    add_edge(points, x, y0, z0, x0, y0, z0)
+    add_edge(points, x0, y0, z0, x0, y, z0)
+    
+    add_edge(points, x, y, z, x, y, z0)
+    add_edge(points, x0, y, z, x0, y, z0)
+    add_edge(points, x, y0, z, x, y0, z0)
+    add_edge(points, x0, y0, z, x0, y0, z0)
+
+    add_edge(points, x, y, z, x0, y, z)
+    add_edge(points, x, y, z, x, y0, z)
+    add_edge(points, x, y0, z, x0, y0, z)
+    add_edge(points, x0, y0, z, x0, y, z)
 
 def add_sphere( points, cx, cy, cz, r, step ):
-    pass
+    s = new_matrix(4,0)
+    generate_sphere(s, cx, cy, cz, r, step)
+    for point in s:
+        add_edge(points, point[0], point[1], point[2], point[0]+1, point[1]+1, point[2])
+
 def generate_sphere( points, cx, cy, cz, r, step ):
-    pass
+    x = 1
+    rot = make_rotY(float(360)/step)
+
+    while x <= step:
+        y = float(x)/step
+        add_circle(points, 0, 0, 0, r, step)
+        matrix_mult(rot, points)
+        x += 1
+
+    translate = make_translate(cx, cy, cz)
+    matrix_mult(translate, points)
 
 def add_torus( points, cx, cy, cz, r0, r1, step ):
-    pass
+    t = new_matrix(4,0)
+    generate_torus(t, cx, cy, cz, r0, r1, step)
+
+    for point in t:
+        add_edge(points, point[0], point[1], point[2], point[0]+1, point[1]+1, point[2])
+
 def generate_torus( points, cx, cy, cz, r0, r1, step ):
-    pass
+    x = 1
+    rot_y = make_rotY(float(360)/step)
+
+    while x <= step:
+        y = float(x)/step
+        add_circle(points, r1, 0, 0, r0, step)
+        matrix_mult(rot_y, points)
+        x += 1
+    translate = make_translate(cx, cy, cz)
+    matrix_mult(translate, points)
+    rot_x = make_rotX(90)
+    matrix_mult(rot_x, points)
 
 def add_circle( points, cx, cy, cz, r, step ):
     x0 = r + cx
